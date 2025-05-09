@@ -1,0 +1,789 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of Phan Danh Dat, a data analyst and developer.">
+    <meta name="keywords" content="portfolio, data analyst, developer, Phan Danh Dat">
+    <title>Portfolio - Phan Danh Đạt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(145deg, #0a0a0a 0%, #1c1c1c 100%);
+            color: #f0f0f0;
+            line-height: 1.8;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: transparent;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .navigation {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.95);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            padding: 20px 0;
+            text-align: center;
+            z-index: 1000;
+            animation: slideIn 0.4s ease-out;
+            box-shadow: 0 2px 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .navigation a {
+            color: #00ff88;
+            text-decoration: none;
+            margin: 0 25px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            padding: 8px 12px;
+        }
+
+        .navigation a:hover, .navigation a.active {
+            color: #ff0077;
+            transform: scale(1.1);
+            text-shadow: 0 0 15px #ff0077;
+        }
+
+        .navigation a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(to right, #00ff88, #ff0077);
+            transition: width 0.3s ease;
+        }
+
+        .navigation a:hover::after, .navigation a.active::after {
+            width: 100%;
+        }
+
+        .navigation.disabled a {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .header {
+            text-align: center;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-in;
+            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.15) 0%, transparent 70%);
+        }
+
+        .header.parallax {
+            transform: translateY(calc(var(--scroll-y) * -0.2));
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 6.5rem;
+            background: linear-gradient(45deg, #00ff88, #ff0077);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            margin: 0 0 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .header h1:hover {
+            transform: scale(1.03);
+        }
+
+        .header .since {
+            font-size: 1.3rem;
+            color: #f0f0f0;
+            margin: 0 0 25px;
+            letter-spacing: 3px;
+            opacity: 0.8;
+            text-shadow: 0 0 5px #00ff88;
+        }
+
+        .header p {
+            font-size: 1.4rem;
+            color: #f0f0f0;
+            margin: 0 0 25px;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 5px #00ff88;
+        }
+
+        .header .location {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.1rem;
+            color: #00ff88;
+        }
+
+        .header .location a {
+            color: #00ff88;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 2px solid #00ff88;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .header .location a:hover {
+            background: #00ff88;
+            color: #0a0a0a;
+            border-color: #ff0077;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            text-shadow: none;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: #00ff88;
+            margin: 50px 0 30px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            position: relative;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section-title::after {
+            content: '';
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(to right, #00ff88, #ff0077);
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+        }
+
+        .about {
+            background: rgba(20, 20, 20, 0.85);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
+            margin-bottom: 50px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .about p {
+            font-size: 1.2rem;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.2);
+        }
+
+        .project-list {
+            display: grid;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .project-card {
+            background: linear-gradient(rgba(20, 20, 20, 0.9), rgba(20, 20, 20, 0.9)) padding-box, linear-gradient(45deg, #00ff88, #ff0077) border-box;
+            padding: 30px;
+            border-radius: 20px;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.2);
+            animation: slideIn 0.5s ease-out;
+            border: 1px solid transparent;
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+            will-change: transform, box-shadow;
+        }
+
+        .project-list.reveal .project-card:nth-child(1) { transform: perspective(1000px) rotateY(2deg); }
+        .project-list.reveal .project-card:nth-child(2) { transform: perspective(1000px) rotateY(0deg); }
+        .project-list.reveal .project-card:nth-child(3) { transform: perspective(1000px) rotateY(-2deg); }
+
+        .project-card:hover {
+            transform: perspective(1000px) scale(1.05);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.4);
+        }
+
+        .project-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: #00ff88;
+            margin: 0 0 15px;
+            display: inline-block;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .project-card .github-link {
+            font-size: 1.1rem;
+            color: #ff0077;
+            text-decoration: none;
+            margin-left: 15px;
+            padding: 6px 12px;
+            background: rgba(255, 0, 119, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #ff0077;
+        }
+
+        .project-card .github-link:hover {
+            background: #ff0077;
+            color: #f0f0f0;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ff0077;
+            text-shadow: none;
+        }
+
+        .project-card p {
+            font-size: 1.1rem;
+            color: #f0f0f0;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.2);
+        }
+
+        .project-list.reveal .project-card:nth-child(1) { transition-delay: 0ms; }
+        .project-list.reveal .project-card:nth-child(2) { transition-delay: 100ms; }
+        .project-list.reveal .project-card:nth-child(3) { transition-delay: 200ms; }
+
+        .certificates, .skills {
+            background: rgba(20, 20, 20, 0.85);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .certificates ul, .skills ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .certificates li, .skills li {
+            font-size: 1.2rem;
+            color: #f0f0f0;
+            margin: 15px 0;
+            position: relative;
+            padding-left: 25px;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.2);
+        }
+
+        .certificates li::before, .skills li::before {
+            content: '>';
+            color: #00ff88;
+            font-size: 1.3rem;
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        .certificates a {
+            color: #00ff88;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .certificates a:hover {
+            color: #ff0077;
+            text-shadow: 0 0 15px #ff0077;
+        }
+
+        .certificates.reveal ul li, .skills.reveal ul li {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .certificates.reveal.visible ul li, .skills.reveal.visible ul li {
+            opacity: 1;
+            transform: translateX(0);
+            animation: bounce 0.3s ease-in-out;
+        }
+
+        .certificates.reveal.visible ul li::before, .skills.reveal.visible ul li::before {
+            animation: neon-glow 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(0) scale(1); }
+            50% { transform: translateX(0) scale(1.1); }
+        }
+
+        @keyframes neon-glow {
+            0%, 100% { text-shadow: none; }
+            50% { text-shadow: 0 0 10px #00ff88; }
+        }
+
+        .certificates.reveal ul li:nth-child(1), .skills.reveal ul li:nth-child(1) { transition-delay: 0ms; }
+        .certificates.reveal ul li:nth-child(2), .skills.reveal ul li:nth-child(2) { transition-delay: 100ms; }
+        .skills.reveal ul li:nth-child(3) { transition-delay: 200ms; }
+        .skills.reveal ul li:nth-child(4) { transition-delay: 300ms; }
+        .skills.reveal ul li:nth-child(5) { transition-delay: 400ms; }
+        .skills.reveal ul li:nth-child(6) { transition-delay: 500ms; }
+        .skills.reveal ul li:nth-child(7) { transition-delay: 600ms; }
+        .skills.reveal ul li:nth-child(8) { transition-delay: 700ms; }
+
+        .footer {
+            text-align: center;
+            padding: 50px 0;
+            background: rgba(10, 10, 10, 0.95);
+            animation: fadeIn 0.5s ease-in;
+            box-shadow: 0 -2px 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .footer p {
+            font-size: 1.1rem;
+            color: #f0f0f0;
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.2);
+        }
+
+        .footer a {
+            color: #00ff88;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #ff0077;
+            text-shadow: 0 0 15px #ff0077;
+        }
+
+        .footer i {
+            color: #00ff88;
+            font-size: 1.4rem;
+            transition: all 0.3s ease;
+            animation: icon-pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes icon-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .footer p:hover i {
+            color: #ff0077;
+            animation: none;
+            transform: scale(1.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+            transition: all 0.8s ease-out;
+            will-change: transform, opacity;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(0) scale(1.02); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 4.5rem;
+            }
+
+            .header p {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .project-card h3 {
+                font-size: 1.8rem;
+            }
+
+            .about, .certificates, .skills {
+                padding: 30px;
+            }
+
+            .navigation a {
+                margin: 0 15px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navigation {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .navigation a {
+                font-size: 0.9rem;
+                margin: 5px 10px;
+            }
+
+            .header h1 {
+                font-size: 3.5rem;
+            }
+
+            .header p, .header .since {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .project-card {
+                padding: 20px;
+            }
+
+            .footer p {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header .location {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="container">
+        <div class="navigation" id="navigation">
+            <a href="#about" data-translate="navAbout">About</a>
+            <a href="#projects" data-translate="navProjects">Projects</a>
+            <a href="#certificates" data-translate="navCertificates">Certificates</a>
+            <a href="#skills" data-translate="navSkills">Skills</a>
+            <a href="#contact" data-translate="navContact">Contact</a>
+        </div>
+        <div class="header" id="header">
+            <h1>PHAN DANH DAT</h1>
+            <p class="since">SINCE 2002</p>
+            <p id="headerDesc" data-translate="headerDesc">DATA ANALYST & DEVELOPER</p>
+            <p class="location">
+                VIETNAM, <span id="time"></span>
+                <a onclick="updateLanguage('vi')">Tiếng Việt</a>
+                <a onclick="updateLanguage('en')">English</a>
+            </p>
+        </div>
+        <div class="about reveal" id="about">
+            <h2 class="section-title" id="aboutTitle" data-translate="aboutTitle">Who Am I</h2>
+            <p id="aboutP1" data-translate="aboutP1">I am Phan Danh Dat, a Computer Science student at Thang Long University, driven by data, LLM, AI, ML, and DL. As a data analyst and data engineer, I aim to transform raw data into actionable insights that drive change.</p>
+            <p id="aboutP2" data-translate="aboutP2">Movement, both in work and life, keeps me inspired—whether it's hitting the gym, swimming, or staying active. I believe that maintaining energy and adaptability fuels creativity and problem-solving.</p>
+            <p id="aboutP3" data-translate="aboutP3">I thrive in dynamic environments, always eager to learn, adapt, and innovate in the fast-evolving world of technology.</p>
+        </div>
+        <h2 class="section-title reveal" id="projectsTitle" data-translate="projectsTitle">Personal Projects</h2>
+        <div class="project-list reveal" id="projects">
+            <div class="project-card">
+                <h3 id="project1Title" data-translate="project1Title">Credit Card Clustering <a href="https://github.com/pddczpl/Credit_Card_Clustering" target="_blank" class="github-link">GitHub</a></h3>
+                <p id="project1Desc" data-translate="project1Desc">Customer segmentation analysis using Python, R, Excel, SSMS, and Power BI to design loyalty programs.</p>
+            </div>
+            <div class="project-card">
+                <h3 id="project2Title" data-translate="project2Title">Risk Credit <a href="https://github.com/pddczpl/Risk_Credit" target="_blank" class="github-link">GitHub</a></h3>
+                <p id="project2Desc" data-translate="project2Desc">Analysis to predict customer default risk using Python, R, SSMS, Excel, and Power BI to reduce bad debt rates.</p>
+            </div>
+            <div class="project-card">
+                <h3 id="project3Title" data-translate="project3Title">Revenue Forecast <a href="https://github.com/pddczpl/Revenue_forecast" target="_blank" class="github-link">GitHub</a></h3>
+                <p id="project3Desc" data-translate="project3Desc">Revenue prediction for 12 months using Python, R, SSMS, Excel, and Power BI, analyzing interest rates and inflation impact.</p>
+            </div>
+        </div>
+        <div class="certificates reveal" id="certificates">
+            <h2 class="section-title" id="certificatesTitle" data-translate="certificatesTitle">Certificates</h2>
+            <ul>
+                <li><a href="https://coursera.org/share/bc0b475a764d1e367dca83b38477c725" target="_blank">Google Data Analytics</a></li>
+                <li><a href="https://coursera.org/share/75ffff2976d40df560d771336347a38c" target="_blank">Google Business Intelligence</a></li>
+            </ul>
+        </div>
+        <div class="skills reveal" id="skills">
+            <h2 class="section-title" id="skillsTitle" data-translate="skillsTitle">Skills</h2>
+            <ul>
+                <li>Python</li>
+                <li>R</li>
+                <li>SQL (SSMS)</li>
+                <li>Microsoft Excel</li>
+                <li>Power BI</li>
+                <li>Data Analysis</li>
+                <li>Data Visualization</li>
+                <li>Machine Learning</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer reveal" id="contact">
+        <p><i class="fas fa-envelope"></i> Email: <a href="mailto:phandanhdattt@gmail.com">phandanhdattt@gmail.com</a></p>
+        <p><i class="fab fa-linkedin"></i> LinkedIn: <a href="https://www.linkedin.com/in/czparklin" target="_blank">czparklin</a></p>
+        <p><i class="fas fa-phone"></i> Phone: <a href="tel:0383868402">0383868402</a></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Particle background
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: ['#00ff88', '#ff0077', '#f0f0f0'] },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: '#00ff88', opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 1.5, direction: 'none', random: true }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'bubble' } },
+                modes: { grab: { distance: 200, line_linked: { opacity: 0.7 } }, bubble: { distance: 200, size: 6, duration: 0.3 } }
+            },
+            retina_detect: true
+        });
+
+        // Smooth scrolling for navigation links
+        function attachScrollListeners() {
+            const navLinks = document.querySelectorAll('.navigation a');
+            navLinks.forEach(anchor => {
+                anchor.removeEventListener('click', handleNavClick);
+                anchor.addEventListener('click', handleNavClick);
+            });
+        }
+
+        function handleNavClick(e) {
+            e.preventDefault();
+            if (!this) {
+                console.warn('Navigation link context is undefined');
+                return;
+            }
+            const href = this.getAttribute('href');
+            if (typeof href !== 'string' || href === '') {
+                console.warn('Invalid or missing href attribute on navigation link:', this, 'Text:', this.textContent);
+                return;
+            }
+            const targetId = href.charAt(0) === '#' ? href.slice(1) : href;
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+                document.querySelectorAll('.navigation a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+            } else {
+                console.warn('Target element not found for ID:', targetId);
+            }
+        }
+
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const vietnamTime = now.toLocaleString('en-US', { 
+                timeZone: 'Asia/Ho_Chi_Minh', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+            const timeElement = document.getElementById('time');
+            if (timeElement) {
+                timeElement.textContent = vietnamTime;
+            }
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Language switching
+        let currentLang = 'en';
+        let isUpdating = false;
+        const translations = {
+            en: {
+                navAbout: 'About',
+                navProjects: 'Projects',
+                navCertificates: 'Certificates',
+                navSkills: 'Skills',
+                navContact: 'Contact',
+                headerDesc: 'DATA ANALYST & DEVELOPER',
+                aboutTitle: 'Who Am I',
+                aboutP1: 'I am Phan Danh Dat, a Computer Science student at Thang Long University, driven by data, LLM, AI, ML, and DL. As a data analyst and data engineer, I aim to transform raw data into actionable insights that drive change.',
+                aboutP2: 'Movement, both in work and life, keeps me inspired—whether it\'s hitting the gym, swimming, or staying active. I believe that maintaining energy and adaptability fuels creativity and problem-solving.',
+                aboutP3: 'I thrive in dynamic environments, always eager to learn, adapt, and innovate in the fast-evolving world of technology.',
+                projectsTitle: 'Personal Projects',
+                project1Title: 'Credit Card Clustering',
+                project1Desc: 'Customer segmentation analysis using Python, R, Excel, SSMS, and Power BI to design loyalty programs.',
+                project2Title: 'Risk Credit',
+                project2Desc: 'Analysis to predict customer default risk using Python, R, SSMS, Excel, and Power BI to reduce bad debt rates.',
+                project3Title: 'Revenue Forecast',
+                project3Desc: 'Revenue prediction for 12 months using Python, R, SSMS, Excel, and Power BI, analyzing interest rates and inflation impact.',
+                certificatesTitle: 'Certificates',
+                skillsTitle: 'Skills'
+            },
+            vi: {
+                navAbout: 'Giới Thiệu',
+                navProjects: 'Dự Án',
+                navCertificates: 'Chứng Chỉ',
+                navSkills: 'Kỹ Năng',
+                navContact: 'Liên Hệ',
+                headerDesc: 'CHUYÊN GIA PHÂN TÍCH DỮ LIỆU & PHÁT TRIỂN',
+                aboutTitle: 'Tôi Là Ai',
+                aboutP1: 'Tôi là Phan Danh Đạt, sinh viên Khoa học Máy tính tại Đại học Thăng Long, đam mê dữ liệu, LLM, AI, ML, và DL. Là một nhà phân tích dữ liệu và kỹ sư dữ liệu, tôi hướng đến việc biến dữ liệu thô thành những hiểu biết có thể tạo ra sự thay đổi.',
+                aboutP2: 'Vận động, cả trong công việc và cuộc sống, giữ tôi luôn tràn đầy cảm hứng—dù là ở phòng gym, bơi lội, hay duy trì sự năng động. Tôi tin rằng việc giữ năng lượng và khả năng thích nghi sẽ nuôi dưỡng sự sáng tạo và cách tiếp cận giải quyết vấn đề.',
+                aboutP3: 'Tôi phát triển trong môi trường năng động, luôn sẵn sàng học hỏi, thích nghi và đổi mới trong thế giới công nghệ không ngừng phát triển.',
+                projectsTitle: 'Dự Án Cá Nhân',
+                project1Title: 'Phân Cụm Thẻ Tín Dụng',
+                project1Desc: 'Phân tích phân cụm khách hàng bằng Python, R, Excel, SSMS và Power BI để thiết kế chương trình khách hàng thân thiết.',
+                project2Title: 'Rủi Ro Tín Dụng',
+                project2Desc: 'Phân tích dự đoán rủi ro vỡ nợ của khách hàng bằng Python, R, SSMS, Excel và Power BI để giảm tỷ lệ nợ xấu.',
+                project3Title: 'Dự Báo Doanh Thu',
+                project3Desc: 'Dự báo doanh thu 12 tháng bằng Python, R, SSMS, Excel và Power BI, phân tích tác động của lãi suất và lạm phát.',
+                certificatesTitle: 'Chứng Chỉ',
+                skillsTitle: 'Kỹ Năng'
+            }
+        };
+
+        function updateLanguage(lang) {
+            if (isUpdating || currentLang === lang) return;
+            isUpdating = true;
+            const nav = document.getElementById('navigation');
+            if (nav) nav.classList.add('disabled');
+
+            setTimeout(() => {
+                const translatableElements = document.querySelectorAll('[data-translate]');
+                const projectTitleKeys = ['project1Title', 'project2Title', 'project3Title'];
+                translatableElements.forEach(element => {
+                    try {
+                        const key = element.dataset.translate;
+                        if (!key) {
+                            console.warn('Missing data-translate key on element:', element);
+                            return;
+                        }
+                        if (!translations[lang][key]) {
+                            console.warn('Translation key not found:', key, 'Element:', element);
+                            return;
+                        }
+                        if (projectTitleKeys.includes(key)) {
+                            const textNode = Array.from(element.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+                            if (textNode) {
+                                textNode.textContent = translations[lang][key] + ' ';
+                            } else {
+                                console.warn('No text node found for project title:', element, 'Key:', key);
+                            }
+                        } else {
+                            element.textContent = translations[lang][key];
+                        }
+                    } catch (error) {
+                        console.error('Error processing element:', element, 'Error:', error);
+                    }
+                });
+                currentLang = lang;
+                if (nav) nav.classList.remove('disabled');
+                isUpdating = false;
+            }, 100);
+        }
+
+        // Parallax and reveal effects
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, { threshold: 0.2, rootMargin: '-50px' });
+
+        document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
+
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            const scrollY = window.scrollY;
+            header.style.setProperty('--scroll-y', scrollY + 'px');
+        });
+
+        // Initial setup
+        attachScrollListeners();
+        updateLanguage('en');
+    </script>
+</body>
+</html>
