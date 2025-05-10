@@ -1,0 +1,124 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of Phan Danh Dat, a data analyst and developer.">
+    <meta name="keywords" content="portfolio, data analyst, developer, Phan Danh Dat">
+    <title>Portfolio - Phan Danh Đạt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="container">
+        <div class="navigation" id="navigation">
+            <a href="#about" data-translate="navAbout">About</a>
+            <a href="#projects" data-translate="navProjects">Projects</a>
+            <a href="#certificates" data-translate="navCertificates">Certificates</a>
+            <a href="#skills" data-translate="navSkills">Skills</a>
+            <a href="#contact" data-translate="navContact">Contact</a>
+        </div>
+        <div class="header" id="header">
+            <h1>PHAN DANH DAT</h1>
+            <p class="since">SINCE 2002</p>
+            <p id="headerDesc" data-translate="headerDesc">DATA ANALYST & DEVELOPER</p>
+            <p class="location">
+                VIETNAM, <span id="time"></span>
+                <a onclick="updateLanguage('vi')">Tiếng Việt</a>
+                <a onclick="updateLanguage('en')">English</a>
+            </p>
+        </div>
+        <div class="about reveal" id="about">
+            <h2 class="section-title" id="aboutTitle" data-translate="aboutTitle">Who Am I</h2>
+            <p id="aboutP1" data-translate="aboutP1">I am Phan Danh Dat, a Computer Science student at Thang Long University, driven by data, LLM, AI, ML, and DL. As a data analyst and data scientist, I aim to transform raw data into actionable insights that drive change.</p>
+            <p id="aboutP2" data-translate="aboutP2">Movement, both in work and life, keeps me inspired—whether it's hitting the gym, swimming, or staying active. I believe that maintaining energy and adaptability fuels creativity and problem-solving.</p>
+            <p id="aboutP3" data-translate="aboutP3">I thrive in dynamic environments, always eager to learn, adapt, and innovate in the fast-evolving world of technology.</p>
+        </div>
+        <h2 class="section-title reveal" id="projectsTitle" data-translate="projectsTitle">Personal Projects</h2>
+        <div class="project-list reveal" id="projects">
+            <div class="project-card">
+                <h3 id="project1Title" data-translate="project1Title">Credit Card Clustering <a href="https://github.com/pddczpl/Credit_Card_Clustering" target="_blank" class="github-link">GitHub</a></h3>
+                <p id="project1Desc" data-translate="project1Desc">Customer segmentation analysis using Python, R, Excel, SSMS, and Power BI to design loyalty programs.</p>
+            </div>
+            <div class="project-card">
+                <h3 id="project2Title" data-translate="project2Title">Risk Credit <a href="https://github.com/pddczpl/Risk_Credit" target="_blank" class="github-link">GitHub</a></h3>
+                <p id="project2Desc" data-translate="project2Desc">Analysis to predict customer default risk using Python, R, SSMS, Excel, and Power BI to reduce bad debt rates.</p>
+            </div>
+            <div class="project-card">
+                <h3 id="project3Title" data-translate="project3Title">Revenue Forecast <a href="https://github.com/pddczpl/Revenue_forecast" target="_blank" class="github-link">GitHub</a></h3>
+                <p id="project3Desc" data-translate="project3Desc">Revenue prediction for 12 months using Python, R, SSMS, Excel, and Power BI, analyzing interest rates and inflation impact.</p>
+            </div>
+        </div>
+        <div class="certificates reveal" id="certificates">
+            <h2 class="section-title" id="certificatesTitle" data-translate="certificatesTitle">Certificates</h2>
+            <ul>
+                <li><a href="https://coursera.org/share/bc0b475a764d1e367dca83b38477c725" target="_blank">Google Data Analytics</a></li>
+                <li><a href="https://coursera.org/share/75ffff2976d40df560d771336347a38c" target="_blank">Google Business Intelligence</a></li>
+            </ul>
+        </div>
+        <div class="skills reveal" id="skills">
+            <h2 class="section-title" id="skillsTitle" data-translate="skillsTitle">Skills</h2>
+            <ul>
+                <li>Python</li>
+                <li>R</li>
+                <li>SQL (SSMS)</li>
+                <li>Microsoft Excel</li>
+                <li>Power BI</li>
+                <li>Data Analysis</li>
+                <li>Data Visualization</li>
+                <li>Machine Learning</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer reveal" id="contact">
+        <p><i class="fas fa-envelope"></i> Email: <a href="/cdn-cgi/l/email-protection#69594148474d4847414d485d5d5d694e44484045074a4644"><span class="__cf_email__" data-cfemail="ea9a828b848e8b84828e8b9e9e9eaa8d878b8386c4898587">[email&#160;protected]</span></a></p>
+        <p><i class="fab fa-linkedin"></i> LinkedIn: <a href="https://www.linkedin.com/in/czparklin" target="_blank">czparklin</a></p>
+        <p><i class="fas fa-phone"></i> Phone: <a href="tel:0383868402">0383868402</a></p>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
