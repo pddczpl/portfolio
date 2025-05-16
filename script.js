@@ -1,4 +1,4 @@
-// Particle background
+/* Particle background */
 particlesJS('particles-js', {
     particles: {
         number: { value: 80, density: { enable: true, value_area: 800 } },
@@ -17,7 +17,7 @@ particlesJS('particles-js', {
     retina_detect: true
 });
 
-// Smooth scrolling for navigation links
+/* Smooth scrolling for navigation links */
 function attachScrollListeners() {
     const navLinks = document.querySelectorAll('.navigation a');
     navLinks.forEach(anchor => {
@@ -51,7 +51,7 @@ function handleNavClick(e) {
     }
 }
 
-// Update time display
+/* Update time display */
 function updateTime() {
     const now = new Date();
     const vietnamTime = now.toLocaleString('en-US', { 
@@ -68,7 +68,7 @@ function updateTime() {
 setInterval(updateTime, 1000);
 updateTime();
 
-// Language switching
+/* Language switching */
 let currentLang = 'en';
 let isUpdating = false;
 const translations = {
@@ -84,12 +84,16 @@ const translations = {
         aboutP2: 'Movement, both in work and life, keeps me inspired—whether it\'s hitting the gym, swimming, or staying active. I believe that maintaining energy and adaptability fuels creativity and problem-solving.',
         aboutP3: 'I thrive in dynamic environments, always eager to learn, adapt, and innovate in the fast-evolving world of technology.',
         projectsTitle: 'Personal Projects',
-        project1Title: 'Credit Card Clustering',
-        project1Desc: 'Customer segmentation analysis using Python, R, Excel, SSMS, and Power BI to design loyalty programs.',
-        project2Title: 'Risk Credit',
-        project2Desc: 'Analysis to predict customer default risk using Python, R, SSMS, Excel, and Power BI to reduce bad debt rates.',
-        project3Title: 'Revenue Forecast',
-        project3Desc: 'Revenue prediction for 12 months using Python, R, SSMS, Excel, and Power BI, analyzing interest rates and inflation impact.',
+        project1Title: 'API AQI',
+        project1Desc: 'Developed a system to monitor air quality (AQI - Air Quality Index) in Hanoi, predicting AQI for the next 24 hours, including Real-time Processing, Automated Data Collection, Continuous Modeling and ML, and Real-time Updating Visualization.',
+        project2Title: 'Credit Card Fraud Detection',
+        project2Desc: 'Analysis to predict fraudulent credit card transactions using Deep Learning, helping banks reduce financial losses and protect customers.',
+        project3Title: 'Credit Card Clustering',
+        project3Desc: 'Customer segmentation analysis using Python, R, Excel, SSMS, and Power BI to design loyalty programs.',
+        project4Title: 'Risk Credit',
+        project4Desc: 'Analysis to predict customer default risk using Python, R, SSMS, Excel, and Power BI to reduce bad debt rates.',
+        project5Title: 'Revenue Forecast',
+        project5Desc: 'Revenue prediction for 12 months using Python, R, SSMS, Excel, and Power BI, analyzing interest rates and inflation impact.',
         certificatesTitle: 'Certificates',
         skillsTitle: 'Skills'
     },
@@ -105,12 +109,16 @@ const translations = {
         aboutP2: 'Vận động, cả trong công việc và cuộc sống, giữ tôi luôn tràn đầy cảm hứng—dù là ở phòng gym, bơi lội, hay duy trì sự năng động. Tôi tin rằng việc giữ năng lượng và khả năng thích nghi sẽ nuôi dưỡng sự sáng tạo và cách tiếp cận giải quyết vấn đề.',
         aboutP3: 'Tôi phát triển trong môi trường năng động, luôn sẵn sàng học hỏi, thích nghi và đổi mới trong thế giới công nghệ không ngừng phát triển.',
         projectsTitle: 'Dự Án Cá Nhân',
-        project1Title: 'Phân Cụm Thẻ Tín Dụng',
-        project1Desc: 'Phân tích phân cụm khách hàng bằng Python, R, Excel, SSMS và Power BI để thiết kế chương trình khách hàng thân thiết.',
-        project2Title: 'Rủi Ro Tín Dụng',
-        project2Desc: 'Phân tích dự đoán rủi ro vỡ nợ của khách hàng bằng Python, R, SSMS, Excel và Power BI để giảm tỷ lệ nợ xấu.',
-        project3Title: 'Dự Báo Doanh Thu',
-        project3Desc: 'Dự báo doanh thu 12 tháng bằng Python, R, SSMS, Excel và Power BI, phân tích tác động của lãi suất và lạm phát.',
+        project1Title: 'API AQI',
+        project1Desc: 'Xây dựng một hệ thống giám sát chất lượng không khí (AQI - Air Quality Index) tại Hà Nội dự đoán chỉ số AQI trong 24 giờ tới bao gồm: Real-time Processing, Automate data collection, Continuous Modeling and ML, Real-time Updating Visualization.',
+        project2Title: 'Phát Hiện Gian Lận Thẻ Tín Dụng',
+        project2Desc: 'Phân tích dự đoán giao dịch gian lận thẻ tín dụng bằng Deep Learning, giúp ngân hàng giảm tổn thất tài chính và bảo vệ khách hàng.',
+        project3Title: 'Phân Cụm Thẻ Tín Dụng',
+        project3Desc: 'Phân tích phân cụm khách hàng bằng Python, R, Excel, SSMS và Power BI để thiết kế chương trình khách hàng thân thiết.',
+        project4Title: 'Rủi Ro Tín Dụng',
+        project4Desc: 'Phân tích dự đoán rủi ro vỡ nợ của khách hàng bằng Python, R, SSMS, Excel và Power BI để giảm tỷ lệ nợ xấu.',
+        project5Title: 'Dự Báo Doanh Thu',
+        project5Desc: 'Dự báo doanh thu 12 tháng bằng Python, R, SSMS, Excel và Power BI, phân tích tác động của lãi suất và lạm phát.',
         certificatesTitle: 'Chứng Chỉ',
         skillsTitle: 'Kỹ Năng'
     }
@@ -124,7 +132,7 @@ function updateLanguage(lang) {
 
     setTimeout(() => {
         const translatableElements = document.querySelectorAll('[data-translate]');
-        const projectTitleKeys = ['project1Title', 'project2Title', 'project3Title'];
+        const projectTitleKeys = ['project1Title', 'project2Title', 'project3Title', 'project4Title', 'project5Title'];
         translatableElements.forEach(element => {
             try {
                 const key = element.dataset.translate;
@@ -156,7 +164,7 @@ function updateLanguage(lang) {
     }, 100);
 }
 
-// Parallax and reveal effects
+/* Parallax and reveal effects */
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -175,6 +183,6 @@ window.addEventListener('scroll', () => {
     header.style.setProperty('--scroll-y', scrollY + 'px');
 });
 
-// Initial setup
+/* Initial setup */
 attachScrollListeners();
 updateLanguage('en');

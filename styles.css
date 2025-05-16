@@ -217,6 +217,8 @@ body {
 .project-list.reveal .project-card:nth-child(1) { transform: perspective(1000px) rotateY(2deg); }
 .project-list.reveal .project-card:nth-child(2) { transform: perspective(1000px) rotateY(0deg); }
 .project-list.reveal .project-card:nth-child(3) { transform: perspective(1000px) rotateY(-2deg); }
+.project-list.reveal .project-card:nth-child(4) { transform: perspective(1000px) rotateY(2deg); }
+.project-list.reveal .project-card:nth-child(5) { transform: perspective(1000px) rotateY(0deg); }
 
 .project-card:hover {
     transform: perspective(1000px) scale(1.05);
@@ -261,6 +263,8 @@ body {
 .project-list.reveal .project-card:nth-child(1) { transition-delay: 0ms; }
 .project-list.reveal .project-card:nth-child(2) { transition-delay: 100ms; }
 .project-list.reveal .project-card:nth-child(3) { transition-delay: 200ms; }
+.project-list.reveal .project-card:nth-child(4) { transition-delay: 300ms; }
+.project-list.reveal .project-card:nth-child(5) { transition-delay: 400ms; }
 
 .certificates, .skills {
     background: rgba(20, 20, 20, 0.85);
