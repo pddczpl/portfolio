@@ -93,7 +93,7 @@ const translations = {
         project4Title: 'Risk Credit',
         project4Desc: 'Analyzing and Predicting Customer Default Risk to Reduce Non-Performing Loan Rates.',
         project5Title: 'Revenue Forecast',
-        project5Desc: 'Revenue prediction for the next 12 months and analyzing interest rates and inflation impact.',
+        project5Desc: 'Revenue prediction for the next 12 months and analyzing interest rates, inflation impact.',
         certificatesTitle: 'Certificates',
         skillsTitle: 'Skills'
     },
